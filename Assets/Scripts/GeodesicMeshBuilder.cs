@@ -41,30 +41,41 @@ public static class GeodesicMeshBuilder
             Vector3 roomCenter = roomCenters[roomIdx];
             Vector3 roomNormal = roomCenter.normalized;
             bool isPentagon = roomIdx < pentagons.Count;
-
-            // Calculate flattened room center (push slightly inward for flat floor)
             float roomRadius = roomCenter.magnitude;
-            Vector3 flatCenter = roomNormal * (roomRadius * (1f - flattenAmount * 0.05f));
 
-            // Get corner positions and apply edge smoothing
-            List<Vector3> corners = new List<Vector3>();
+            // Room center stays at sphere surface (no inward push)
+            Vector3 flatCenter = roomCenter;
+
+            // Get original corner positions
+            List<Vector3> sphereCorners = new List<Vector3>();
             foreach (int faceIdx in cornerIndices)
             {
                 if (faceIdx < faceCenters.Count)
                 {
-                    Vector3 corner = faceCenters[faceIdx];
-                    
-                    // Blend between sphere surface and flat plane
-                    // Corners stay mostly on sphere, slight flattening toward room plane
-                    float edgeFlatten = flattenAmount * 0.3f;
-                    Vector3 projectedCorner = ProjectToPlane(corner, flatCenter, roomNormal);
-                    corner = Vector3.Lerp(corner, projectedCorner, edgeFlatten);
-                    
-                    corners.Add(corner);
+                    sphereCorners.Add(faceCenters[faceIdx]);
                 }
             }
 
-            if (corners.Count < 3) continue;
+            if (sphereCorners.Count < 3) continue;
+
+            // Project ALL corners onto the tangent plane at roomCenter
+            // This creates a truly flat polygon
+            List<Vector3> flatCorners = new List<Vector3>();
+            foreach (Vector3 sphereCorner in sphereCorners)
+            {
+                Vector3 projected = ProjectToPlane(sphereCorner, roomCenter, roomNormal);
+                flatCorners.Add(projected);
+            }
+
+            // Final corners are interpolated between sphere and flat based on flattenAmount
+            List<Vector3> corners = new List<Vector3>();
+            for (int i = 0; i < sphereCorners.Count; i++)
+            {
+                // flattenAmount = 0 → sphere surface
+                // flattenAmount = 1 → completely flat
+                Vector3 blended = Vector3.Lerp(sphereCorners[i], flatCorners[i], flattenAmount);
+                corners.Add(blended);
+            }
 
             // Create fan triangulation: center → corner[i] → corner[i+1]
             int centerVertexIdx = vertices.Count;
