@@ -112,7 +112,7 @@ public class RoomManager : MonoBehaviour
         if (!room.hasBeenVisited)
         {
             room.hasBeenVisited = true;
-            Debug.Log($"[RoomManager] First visit to room (Biome: {room.roomData.biomeType})");
+            Debug.Log($"[RoomManager] First visit to room (Biome: {room.roomData.Biome})");
         }
 
         OnRoomEntered?.Invoke(room);
@@ -174,7 +174,7 @@ public class RoomManager : MonoBehaviour
         room.isCleared = true;
         OnRoomCleared?.Invoke(room);
 
-        Debug.Log($"[RoomManager] ROOM CLEARED! (Biome: {room.roomData.biomeType})");
+        Debug.Log($"[RoomManager] ROOM CLEARED! (Biome: {room.roomData.Biome})");
 
         // Rewards
         GameUI ui = FindFirstObjectByType<GameUI>();

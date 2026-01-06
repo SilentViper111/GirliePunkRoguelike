@@ -23,6 +23,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public UnityEvent<float, float> OnHealthChanged; // current, max
     public UnityEvent OnDeath;
     public UnityEvent OnDamageTaken;
+    public UnityEvent<float> onDamaged; // damage amount
     
     // Properties
     public bool IsAlive => currentHealth > 0;
@@ -82,6 +83,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
         OnDamageTaken?.Invoke();
+        onDamaged?.Invoke(amount);
         
         // Visual feedback
         StartCoroutine(FlashDamage());
