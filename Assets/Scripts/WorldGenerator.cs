@@ -384,6 +384,8 @@ public class WorldGenerator : MonoBehaviour
     /// </summary>
     private void SpawnPlayer()
     {
+        Debug.Log($"[WorldGenerator] SpawnPlayer called. worldRadius={worldRadius}, totalRoomCount={totalRoomCount}");
+        
         // Find player if not assigned
         if (playerTransform == null)
         {
@@ -403,12 +405,16 @@ public class WorldGenerator : MonoBehaviour
             Debug.LogWarning("[WorldGenerator] No player found to spawn!");
             return;
         }
+        
+        Debug.Log($"[WorldGenerator] Found player: {playerTransform.name}");
 
         // Pick spawn room (random hexagon if not specified)
         if (playerSpawnRoomIndex < 0 || playerSpawnRoomIndex >= totalRoomCount)
         {
             playerSpawnRoomIndex = GetRandomStartRoom();
         }
+        
+        Debug.Log($"[WorldGenerator] Player spawn room index: {playerSpawnRoomIndex}, roomCenters count: {(_roomCenters != null ? _roomCenters.Count : 0)}");
 
         // Mark room as spawn
         if (playerSpawnRoomIndex < _roomDataList.Count)
@@ -416,19 +422,36 @@ public class WorldGenerator : MonoBehaviour
             _roomDataList[playerSpawnRoomIndex].isPlayerSpawn = true;
         }
 
-        // Position player
-        Vector3 spawnPos = GetRoomCenter(playerSpawnRoomIndex);
-        Vector3 spawnNormal = spawnPos.normalized;
+        // Get spawn direction - use room center direction or default to UP
+        Vector3 spawnDirection;
+        if (_roomCenters != null && playerSpawnRoomIndex < _roomCenters.Count)
+        {
+            spawnDirection = _roomCenters[playerSpawnRoomIndex].normalized;
+            Debug.Log($"[WorldGenerator] Using room center direction: {spawnDirection}");
+        }
+        else
+        {
+            spawnDirection = Vector3.up;
+            Debug.Log("[WorldGenerator] Using default UP direction");
+        }
         
-        // Offset above surface (player should stand ON the sphere)
-        float spawnHeight = 5f; // Higher offset to ensure not inside mesh
-        Vector3 finalPos = spawnPos + spawnNormal * spawnHeight;
+        // Force spawn position to be ON the sphere surface at worldRadius
+        float spawnHeight = 3f; // Units above surface
+        Vector3 surfacePos = spawnDirection * worldRadius;
+        Vector3 finalPos = surfacePos + spawnDirection * spawnHeight;
         
+        Debug.Log($"[WorldGenerator] Final spawn: surfacePos={surfacePos}, finalPos={finalPos}, magnitude={finalPos.magnitude}");
+
+        // Apply position
         playerTransform.position = finalPos;
-        playerTransform.rotation = Quaternion.LookRotation(
-            Vector3.ProjectOnPlane(Vector3.forward, spawnNormal).normalized, 
-            spawnNormal
-        );
+        
+        // Orient player to stand on sphere (up = outward from center)
+        Vector3 forward = Vector3.ProjectOnPlane(Vector3.forward, spawnDirection);
+        if (forward.sqrMagnitude < 0.01f)
+            forward = Vector3.ProjectOnPlane(Vector3.right, spawnDirection);
+        forward = forward.normalized;
+        
+        playerTransform.rotation = Quaternion.LookRotation(forward, spawnDirection);
         
         // Reset any velocity if rigidbody exists
         Rigidbody rb = playerTransform.GetComponent<Rigidbody>();
@@ -438,7 +461,7 @@ public class WorldGenerator : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
         
-        Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}, pos: {finalPos}, radius: {spawnPos.magnitude}");
+        Debug.Log($"[WorldGenerator] SUCCESS! Player spawned at {finalPos} (distance from center: {finalPos.magnitude})");
     }
 
     /// <summary>
