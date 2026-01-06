@@ -39,6 +39,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     
     private void Awake()
     {
+        if (OnHealthChanged == null) OnHealthChanged = new UnityEvent<float, float>();
+        if (OnDeath == null) OnDeath = new UnityEvent();
+        if (OnDamageTaken == null) OnDamageTaken = new UnityEvent();
+        if (onDamaged == null) onDamaged = new UnityEvent<float>();
+
         currentHealth = maxHealth;
         
         if (playerRenderer == null)

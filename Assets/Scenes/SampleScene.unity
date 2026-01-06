@@ -545,8 +545,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -59.84}
+  m_LocalRotation: {x: 0.5257311, y: 0, z: 0, w: 0.85065085}
+  m_LocalPosition: {x: 0, y: 533, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -608,7 +608,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e62ab9bb08e5d434d8de42961c8db5d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SphereFollowCamera
-  target: {fileID: 0}
+  target: {fileID: 771149099}
   findPlayerOnStart: 1
   heightAbovePlayer: 30
   distanceBehind: 10
@@ -1565,25 +1565,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037dd4bb89a2a4b658647b90207e7027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 10
-  rotationSpeed: 15
-  gravityStrength: 20
-  trashPrefab: {fileID: 5580762647628404937, guid: a5ca4b2f93aa94a9694f2e905dca3efc, type: 3}
-  bombPrefab: {fileID: 2007207478356871362, guid: f718831933a724ffe8c4aedad34780d2, type: 3}
-  firePoint: {fileID: 0}
-  trashFireRate: 0.15
-  bombCooldown: 0.5
-  maxBombs: 3
-  currentBombs: 3
-  playerCamera: {fileID: 0}
-  _rb: {fileID: 0}
-  _moveInput: {x: 0, y: 0}
-  _aimInput: {x: 0, y: 0}
-  _currentUp: {x: 0, y: 0, z: 0}
-  _lastTrashTime: 0
-  _lastBombTime: 0
-  _wantsToFireTrash: 0
-  _wantsToFireBomb: 0
 --- !u!114 &771149088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1716,6 +1697,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawnFix
   worldRadius: 500
   spawnHeight: 3
+--- !u!4 &771149099 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4770420561452823559, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+  m_PrefabInstance: {fileID: 5495979521354822234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2891,6 +2877,14 @@ PrefabInstance:
     - target: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       propertyPath: m_TagString
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7566215302128203687, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7566215302128203687, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 7735266329457677214, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       propertyPath: m_Material

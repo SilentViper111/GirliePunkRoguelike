@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Emergency spawn fix - moves player to correct position on sphere surface.
-/// Attach to Player. Uses Awake() to run BEFORE any Start() methods.
+/// Attach to Player. This runs in Start() to ensure player spawns correctly.
 /// </summary>
 public class PlayerSpawnFix : MonoBehaviour
 {
@@ -10,10 +10,8 @@ public class PlayerSpawnFix : MonoBehaviour
     [SerializeField] private float worldRadius = 500f;
     [SerializeField] private float spawnHeight = 3f;
     
-    private void Awake()
+    private void Start()
     {
-        Debug.Log($"[PlayerSpawnFix] Awake() called. Current position: {transform.position}");
-        
         // Force player position to top of sphere
         Vector3 spawnDirection = Vector3.up;
         Vector3 targetPos = spawnDirection * (worldRadius + spawnHeight);
@@ -29,12 +27,6 @@ public class PlayerSpawnFix : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
         
-        Debug.Log($"[PlayerSpawnFix] Moved player to {targetPos} (radius: {targetPos.magnitude})");
-    }
-    
-    private void Start()
-    {
-        // Double-check position in Start as well
-        Debug.Log($"[PlayerSpawnFix] Start() - position is now: {transform.position}");
+        Debug.Log($"[PlayerSpawnFix] Moved player to {targetPos} on sphere surface");
     }
 }
