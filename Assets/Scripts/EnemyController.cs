@@ -290,6 +290,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (spawner != null)
             spawner.OnEnemyKilled(gameObject, scoreValue);
             
+        // Pickup drop
+        if (PickupSpawner.Instance != null)
+            PickupSpawner.Instance.TrySpawnPickupAtPosition(transform.position);
+            
         Debug.Log($"[Enemy] Died! Worth {scoreValue} points");
         
         // Disable physics and destroy

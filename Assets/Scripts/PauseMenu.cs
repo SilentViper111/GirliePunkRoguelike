@@ -43,8 +43,8 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
-        // Toggle pause with Escape key
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Toggle pause with Escape key using new Input System
+        if (UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             if (_isPaused)
                 Resume();
