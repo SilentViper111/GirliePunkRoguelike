@@ -136,7 +136,8 @@ public class WorldGenerator : MonoBehaviour
         }
 
         // Step 8: Spawn player at random hexagon
-        SpawnPlayer();
+        // DISABLED - PlayerSpawnFix component handles spawn positioning now
+        // SpawnPlayer();
 
         // Step 9: Generate room outlines
         if (generateOutlines)
