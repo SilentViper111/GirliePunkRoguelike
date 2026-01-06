@@ -4,8 +4,8 @@ using UnityEditor.SceneManagement;
 
 /// <summary>
 /// ROBUST Editor tool to fully setup the GirliePunk scene.
-/// Creates Player, GameSystems, and ensures runtime safety.
-/// Adds "Tools/GirliePunk/Fix Scene" menu item.
+/// Creates Player, GameSystems, adds RuntimePlayerCreator for fail-safe operation.
+/// Menu: Tools/GirliePunk/Fix Scene
 /// </summary>
 public class SceneSetupTool : EditorWindow
 {
@@ -30,7 +30,7 @@ public class SceneSetupTool : EditorWindow
         SetupCamera();
 
         // 6. Save Scene
-        var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+        var scene = EditorSceneManager.GetActiveScene();
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         
@@ -38,10 +38,14 @@ public class SceneSetupTool : EditorWindow
         
         EditorUtility.DisplayDialog("Scene Fixed!", 
             "✅ Player created at (0, 505, 0)\n" +
-            "✅ RuntimePlayerCreator added (fail-safe)\n" +
+            "✅ RuntimePlayerCreator added to WorldGenerator\n" +
             "✅ GameSystems configured\n" +
             "✅ Camera following player\n" +
             "✅ Scene SAVED\n\n" +
+            "RuntimePlayerCreator will auto-create:\n" +
+            "• Player if missing\n" +
+            "• Projectile prefabs at runtime\n" +
+            "• Camera configuration\n\n" +
             "Press Play to test!", "OK");
     }
 
@@ -56,10 +60,17 @@ public class SceneSetupTool : EditorWindow
                 wg.AddComponent<RuntimePlayerCreator>();
                 Debug.Log("[SceneSetupTool] Added RuntimePlayerCreator to WorldGenerator");
             }
+            else
+            {
+                Debug.Log("[SceneSetupTool] WorldGenerator already has RuntimePlayerCreator");
+            }
         }
         else
         {
-            Debug.LogWarning("[SceneSetupTool] WorldGenerator not found!");
+            Debug.LogWarning("[SceneSetupTool] WorldGenerator not found! Creating one...");
+            wg = new GameObject("WorldGenerator");
+            wg.AddComponent<WorldGenerator>();
+            wg.AddComponent<RuntimePlayerCreator>();
         }
     }
 
@@ -80,8 +91,8 @@ public class SceneSetupTool : EditorWindow
 
         // Configure player
         player.tag = "Player";
-        player.layer = LayerMask.NameToLayer("Player");
-        if (player.layer == -1) player.layer = 6;
+        int playerLayer = LayerMask.NameToLayer("Player");
+        player.layer = (playerLayer >= 0) ? playerLayer : 6;
 
         // Force correct position (on top of sphere)
         player.transform.position = new Vector3(0, 505, 0);
@@ -91,20 +102,25 @@ public class SceneSetupTool : EditorWindow
         Renderer renderer = player.GetComponent<Renderer>();
         if (renderer != null)
         {
-            Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            
+            Material mat = new Material(shader);
             mat.color = new Color(1f, 0.3f, 0.7f); // Bright pink
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", new Color(1f, 0.3f, 0.7f) * 1.5f);
             renderer.sharedMaterial = mat;
         }
 
-        // Add Components
+        // Add/Verify Components
         EnsureComponent<Rigidbody>(player, rb => {
             rb.useGravity = false;
             rb.constraints = RigidbodyConstraints.FreezeRotation;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         });
         
+        // Ensure CapsuleCollider exists (CreatePrimitive already adds one)
+        EnsureComponent<CapsuleCollider>(player);
         EnsureComponent<GirliePlayerController>(player);
         EnsureComponent<PlayerHealth>(player);
         EnsureComponent<PlayerDash>(player);
