@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e5e2cd758184c368815b0d7083c478, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldGenerator
-  worldRadius: 100
+  worldRadius: 200
   subdivisionLevel: 3
   generateOnStart: 1
   showDebugGizmos: 1
@@ -163,6 +163,10 @@ MonoBehaviour:
   wallThickness: 0.1
   hexRoomPrefab: {fileID: 0}
   pentRoomPrefab: {fileID: 0}
+  assignBiomes: 1
+  spawnObstacles: 1
+  playerTransform: {fileID: 0}
+  playerSpawnRoomIndex: -1
   vertexCount: 642
   pentagonCount: 12
   hexagonCount: 630
@@ -189,7 +193,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 303540797}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 640948649}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -272,6 +276,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -397,6 +402,26 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e62ab9bb08e5d434d8de42961c8db5d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SphereFollowCamera
+  target: {fileID: 0}
+  findPlayerOnStart: 1
+  heightAbovePlayer: 30
+  distanceBehind: 10
+  lookAheadDistance: 5
+  positionSmoothTime: 0.15
+  rotationSmoothSpeed: 10
+  fieldOfView: 60
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,6 +549,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!134 &640948649
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!43 &685068901
 Mesh:
   m_ObjectHideFlags: 0

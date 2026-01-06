@@ -17,7 +17,7 @@ public class WorldGenerator : MonoBehaviour
 {
     [Header("Generation Settings")]
     [SerializeField] private float worldRadius = 100f;
-    [SerializeField] [Range(1, 3)] private int subdivisionLevel = 2;
+    [SerializeField] [Range(1, 3)] private int subdivisionLevel = 1;
     [SerializeField] private bool generateOnStart = true;
     [SerializeField] private bool showDebugGizmos = true;
 
@@ -35,6 +35,12 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private GameObject hexRoomPrefab;
     [SerializeField] private GameObject pentRoomPrefab;
 
+    [Header("Biome & Spawn Settings")]
+    [SerializeField] private bool assignBiomes = true;
+    [SerializeField] private bool spawnObstacles = true;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private int playerSpawnRoomIndex = -1;
+
     [Header("Generated Data (Read-Only)")]
     [SerializeField] private int vertexCount;
     [SerializeField] private int pentagonCount;
@@ -50,6 +56,8 @@ public class WorldGenerator : MonoBehaviour
     private List<Vector3> _faceCenters;
     private List<int>[] _roomAdjacency;
     private List<GameObject> _spawnedRooms = new List<GameObject>();
+    private List<RoomData> _roomDataList = new List<RoomData>();
+    private BiomeGenerator _biomeGenerator;
     private Mesh _worldMesh;
     private MeshFilter _meshFilter;
     private MeshRenderer _meshRenderer;
@@ -111,6 +119,19 @@ public class WorldGenerator : MonoBehaviour
 
         // Step 6: Spawn room prefabs (if assigned)
         SpawnRooms();
+
+        // Step 7: Assign biomes and generate content
+        if (assignBiomes)
+        {
+            AssignBiomes();
+            if (spawnObstacles)
+            {
+                GenerateBiomeContent();
+            }
+        }
+
+        // Step 8: Spawn player at random hexagon
+        SpawnPlayer();
 
         Debug.Log($"[WorldGenerator] Generated: {vertexCount} vertices, {pentagonCount} VIP rooms, {hexagonCount} combat rooms, {_triangles.Count} triangular faces");
     }
@@ -275,6 +296,130 @@ public class WorldGenerator : MonoBehaviour
         if (_roomCenters == null || roomIndex < 0 || roomIndex >= _roomCenters.Count)
             return Vector3.zero;
         return _roomCenters[roomIndex];
+    }
+
+    /// <summary>
+    /// Assigns biomes to all rooms procedurally.
+    /// </summary>
+    private void AssignBiomes()
+    {
+        _roomDataList.Clear();
+        System.Array biomeValues = System.Enum.GetValues(typeof(BiomeType));
+        
+        // Create RoomData for each room
+        for (int i = 0; i < totalRoomCount; i++)
+        {
+            bool isPentagon = i < pentagonCount;
+            int[] corners = isPentagon ? _pentagons[i] : _hexagons[i - pentagonCount];
+            
+            RoomData room = RoomData.Create(i, _roomCenters[i], corners, isPentagon);
+            room.radius = worldRadius * 0.15f; // Approximate room radius
+            
+            // Assign random biome to non-VIP rooms
+            if (!isPentagon)
+            {
+                room.biome = (BiomeType)biomeValues.GetValue(Random.Range(0, biomeValues.Length));
+            }
+            else
+            {
+                room.biome = BiomeType.VoidZone; // VIP rooms are special
+            }
+            
+            // Copy adjacency
+            if (_roomAdjacency != null && i < _roomAdjacency.Length)
+            {
+                room.adjacentRooms = new List<int>(_roomAdjacency[i]);
+            }
+            
+            _roomDataList.Add(room);
+        }
+        
+        Debug.Log($"[WorldGenerator] Assigned biomes to {_roomDataList.Count} rooms");
+    }
+
+    /// <summary>
+    /// Generates obstacles and enemy spawn points using BiomeGenerator.
+    /// </summary>
+    private void GenerateBiomeContent()
+    {
+        _biomeGenerator = GetComponent<BiomeGenerator>();
+        if (_biomeGenerator == null)
+        {
+            _biomeGenerator = gameObject.AddComponent<BiomeGenerator>();
+        }
+
+        // Create container for obstacles
+        Transform obstacleContainer = transform.Find("Obstacles");
+        if (obstacleContainer == null)
+        {
+            GameObject container = new GameObject("Obstacles");
+            container.transform.SetParent(transform);
+            obstacleContainer = container.transform;
+        }
+
+        foreach (var room in _roomDataList)
+        {
+            _biomeGenerator.GenerateRoomContent(room, worldRadius, obstacleContainer);
+        }
+        
+        Debug.Log($"[WorldGenerator] Generated biome content for {_roomDataList.Count} rooms");
+    }
+
+    /// <summary>
+    /// Spawns or moves player to a random hexagon room.
+    /// </summary>
+    private void SpawnPlayer()
+    {
+        // Find player if not assigned
+        if (playerTransform == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj == null)
+            {
+                playerObj = GameObject.Find("Player");
+            }
+            if (playerObj != null)
+            {
+                playerTransform = playerObj.transform;
+            }
+        }
+
+        if (playerTransform == null)
+        {
+            Debug.LogWarning("[WorldGenerator] No player found to spawn!");
+            return;
+        }
+
+        // Pick spawn room (random hexagon if not specified)
+        if (playerSpawnRoomIndex < 0 || playerSpawnRoomIndex >= totalRoomCount)
+        {
+            playerSpawnRoomIndex = GetRandomStartRoom();
+        }
+
+        // Mark room as spawn
+        if (playerSpawnRoomIndex < _roomDataList.Count)
+        {
+            _roomDataList[playerSpawnRoomIndex].isPlayerSpawn = true;
+        }
+
+        // Position player
+        Vector3 spawnPos = GetRoomCenter(playerSpawnRoomIndex);
+        Vector3 spawnNormal = spawnPos.normalized;
+        
+        // Offset slightly above surface
+        playerTransform.position = spawnPos + spawnNormal * 2f;
+        playerTransform.rotation = Quaternion.LookRotation(Vector3.forward, spawnNormal);
+        
+        Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}");
+    }
+
+    /// <summary>
+    /// Gets the RoomData for a specific room index.
+    /// </summary>
+    public RoomData GetRoomData(int roomIndex)
+    {
+        if (roomIndex < 0 || roomIndex >= _roomDataList.Count) return null;
+        return _roomDataList[roomIndex];
     }
 
     private void OnDrawGizmos()
