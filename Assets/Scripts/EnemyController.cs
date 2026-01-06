@@ -253,6 +253,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         // Audio
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayHitEnemy();
+            
+        // Combo hit
+        if (ComboSystem.Instance != null)
+            ComboSystem.Instance.RegisterHit();
         
         Debug.Log($"[Enemy] Took {amount} damage, health: {currentHealth}/{maxHealth}");
         
@@ -290,16 +294,22 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (spawner != null)
             spawner.OnEnemyKilled(gameObject, scoreValue);
             
+        // Combo system
+        if (ComboSystem.Instance != null)
+            ComboSystem.Instance.RegisterKill();
+            
+        // Achievements
+        if (AchievementSystem.Instance != null)
+            AchievementSystem.Instance.ReportProgress(AchievementSystem.AchievementType.KillCount, 1);
+            
         // Pickup drop
         if (PickupSpawner.Instance != null)
             PickupSpawner.Instance.TrySpawnPickupAtPosition(transform.position);
             
         Debug.Log($"[Enemy] Died! Worth {scoreValue} points");
         
-        // Disable physics and destroy
-        _rb.isKinematic = true;
-        GetComponent<Collider>().enabled = false;
-        Destroy(gameObject, 0.5f);
+        // Tetris crumble effect
+        TetrisCrumbleEffect.ApplyCrumbleEffect(gameObject);
     }
 
     private void OnCollisionEnter(Collision collision)
