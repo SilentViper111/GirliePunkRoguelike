@@ -68,10 +68,31 @@ public class SphereFollowCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (target == null) return;
+        // Auto-find player if target is null
+        if (target == null)
+        {
+            TryFindPlayer();
+            if (target == null) return;
+        }
 
         UpdateCameraPosition();
         UpdateCameraRotation();
+    }
+
+    private void TryFindPlayer()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            player = GameObject.Find("Player");
+        }
+        
+        if (player != null)
+        {
+            target = player.transform;
+            SnapToTarget();
+            Debug.Log($"[SphereFollowCamera] Auto-found player: {target.name}");
+        }
     }
 
     /// <summary>
