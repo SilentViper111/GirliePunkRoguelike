@@ -1,5 +1,4 @@
 {
-    "version": 1,
     "name": "PlayerControls",
     "maps": [
         {
@@ -8,27 +7,27 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "51c14550-c7d2-4e1f-bfc8-d186a85e1eae",
-                    "expectedControlType": "",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Aim",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "e2093a9b-a731-4ffb-be1f-2953a3a54e26",
-                    "expectedControlType": "",
+                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "FireTrash",
                     "type": "Button",
                     "id": "3e6d9bf4-50fc-4337-bfed-88ca8cff8e66",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -37,7 +36,7 @@
                     "name": "FireBomb",
                     "type": "Button",
                     "id": "32ca0865-b2ed-43f5-b77f-084f33b735a2",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -46,7 +45,7 @@
                     "name": "Recall",
                     "type": "Button",
                     "id": "2b344bd9-9439-43b5-8270-92eadfbf40bc",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -54,20 +53,64 @@
             ],
             "bindings": [
                 {
-                    "name": "",
-                    "id": "0bc9ae41-1674-4a2a-ac6e-4e216ca143d7",
-                    "path": "",
+                    "name": "2D Vector",
+                    "id": "a1b2c3d4-0001-0001-0001-000000000001",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "a1b2c3d4-0001-0001-0001-000000000002",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Move",
                     "isComposite": false,
-                    "isPartOfComposite": false
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "a1b2c3d4-0001-0001-0001-000000000003",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "a1b2c3d4-0001-0001-0001-000000000004",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "a1b2c3d4-0001-0001-0001-000000000005",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
-                    "id": "22224f74-317a-411a-b53f-a9854f8503e0",
-                    "path": "",
+                    "id": "a1b2c3d4-0002-0001-0001-000000000001",
+                    "path": "<Mouse>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -77,8 +120,8 @@
                 },
                 {
                     "name": "",
-                    "id": "de64ad9b-6a95-4e27-9f3a-ed08176eb905",
-                    "path": "",
+                    "id": "a1b2c3d4-0003-0001-0001-000000000001",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -88,8 +131,8 @@
                 },
                 {
                     "name": "",
-                    "id": "e033186d-5214-45f4-a962-55779ef57894",
-                    "path": "",
+                    "id": "a1b2c3d4-0004-0001-0001-000000000001",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -99,8 +142,8 @@
                 },
                 {
                     "name": "",
-                    "id": "a66835db-f5f1-415b-9906-d409dfa96c5a",
-                    "path": "",
+                    "id": "a1b2c3d4-0005-0001-0001-000000000001",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
