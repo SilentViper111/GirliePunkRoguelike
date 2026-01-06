@@ -9,6 +9,8 @@ using UnityEngine.Rendering;
 /// </summary>
 public class PostProcessingController : MonoBehaviour
 {
+    public static PostProcessingController Instance { get; private set; }
+
     [Header("Bloom Settings")]
     [SerializeField] private float bloomIntensity = 1.5f;
     [SerializeField] private float bloomThreshold = 0.9f;
@@ -34,6 +36,13 @@ public class PostProcessingController : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         _volume = GetComponent<Volume>();
         if (_volume == null)
             _volume = gameObject.AddComponent<Volume>();
