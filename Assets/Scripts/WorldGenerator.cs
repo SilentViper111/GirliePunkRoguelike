@@ -192,39 +192,69 @@ public class WorldGenerator : MonoBehaviour
         if (!showDebugGizmos || _vertices == null || _vertices.Count == 0)
             return;
 
-        // Draw room centers
-        for (int i = 0; i < _roomCenters?.Count; i++)
-        {
-            // Pentagons in magenta, hexagons in cyan
-            Gizmos.color = i < pentagonCount ? new Color(1f, 0f, 1f, 0.8f) : new Color(0f, 1f, 1f, 0.6f);
-            float size = i < pentagonCount ? 2f : 1f;
-            Gizmos.DrawSphere(_roomCenters[i], size);
-        }
-
-        // Draw triangular mesh wireframe
+        // Calculate face centers (these become the corners of rooms in dual graph)
+        List<Vector3> faceCenters = new List<Vector3>();
         if (_triangles != null)
         {
-            Gizmos.color = new Color(1f, 1f, 0f, 0.3f); // Yellow
             foreach (var tri in _triangles)
             {
-                Vector3 a = _vertices[tri[0]];
-                Vector3 b = _vertices[tri[1]];
-                Vector3 c = _vertices[tri[2]];
-                Gizmos.DrawLine(a, b);
-                Gizmos.DrawLine(b, c);
-                Gizmos.DrawLine(c, a);
+                Vector3 center = (_vertices[tri[0]] + _vertices[tri[1]] + _vertices[tri[2]]) / 3f;
+                // Project to sphere surface for clean visualization
+                faceCenters.Add(center.normalized * worldRadius);
             }
         }
 
-        // Draw room adjacency connections
+        // Draw Pentagon rooms (VIP) - Magenta outlines
+        if (_pentagons != null && faceCenters.Count > 0)
+        {
+            Gizmos.color = new Color(1f, 0f, 1f, 1f); // Magenta
+            foreach (var pent in _pentagons)
+            {
+                for (int i = 0; i < pent.Length; i++)
+                {
+                    Vector3 a = faceCenters[pent[i]];
+                    Vector3 b = faceCenters[pent[(i + 1) % pent.Length]];
+                    Gizmos.DrawLine(a, b);
+                }
+            }
+        }
+
+        // Draw Hexagon rooms (Combat) - Cyan outlines
+        if (_hexagons != null && faceCenters.Count > 0)
+        {
+            Gizmos.color = new Color(0f, 1f, 1f, 0.8f); // Cyan
+            foreach (var hex in _hexagons)
+            {
+                for (int i = 0; i < hex.Length; i++)
+                {
+                    Vector3 a = faceCenters[hex[i]];
+                    Vector3 b = faceCenters[hex[(i + 1) % hex.Length]];
+                    Gizmos.DrawLine(a, b);
+                }
+            }
+        }
+
+        // Draw room centers as spheres
+        if (_roomCenters != null)
+        {
+            for (int i = 0; i < _roomCenters.Count; i++)
+            {
+                // Pentagons larger and magenta, hexagons smaller and cyan
+                Gizmos.color = i < pentagonCount ? new Color(1f, 0f, 1f, 0.9f) : new Color(0f, 1f, 1f, 0.6f);
+                float size = i < pentagonCount ? 3f : 1.5f;
+                Gizmos.DrawSphere(_roomCenters[i], size);
+            }
+        }
+
+        // Optional: Draw room adjacency connections (green)
         if (_roomAdjacency != null && _roomCenters != null)
         {
-            Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Green
+            Gizmos.color = new Color(0f, 1f, 0f, 0.2f); // Faint green
             for (int i = 0; i < _roomAdjacency.Length; i++)
             {
                 foreach (int neighbor in _roomAdjacency[i])
                 {
-                    if (neighbor > i) // Avoid drawing twice
+                    if (neighbor > i)
                     {
                         Gizmos.DrawLine(_roomCenters[i], _roomCenters[neighbor]);
                     }
