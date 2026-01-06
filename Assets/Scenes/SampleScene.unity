@@ -684,19 +684,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!134 &335930599
-PhysicsMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 2
-  m_DynamicFriction: 0.6
-  m_StaticFriction: 0.6
-  m_Bounciness: 0
-  m_FrictionCombine: 0
-  m_BounceCombine: 0
 --- !u!1 &349507749
 GameObject:
   m_ObjectHideFlags: 0
@@ -1702,6 +1689,20 @@ MonoBehaviour:
   currentBombs: 3
   playerCamera: {fileID: 0}
 --- !u!114 &771149093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771149081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee82682768374b5f9a6cb0353092c55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawnFix
+  worldRadius: 500
+  spawnHeight: 3
+--- !u!114 &771149094
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2822,6 +2823,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1961903021}
   m_CullTransparentMesh: 1
+--- !u!134 &2014331843
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ' (Instance)'
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1001 &5495979521354822234
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2881,7 +2895,7 @@ PrefabInstance:
     - target: {fileID: 7735266329457677214, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 335930599}
+      objectReference: {fileID: 2014331843}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2907,6 +2921,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 771149093}
+    - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 771149094}
   m_SourcePrefab: {fileID: 100100000, guid: 582c4769af6d04e45972766b5e558185, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
