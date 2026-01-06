@@ -16,7 +16,7 @@ using System.Collections.Generic;
 public class WorldGenerator : MonoBehaviour
 {
     [Header("Generation Settings")]
-    [SerializeField] private float worldRadius = 100f;
+    [SerializeField] private float worldRadius = 500f;
     [SerializeField] [Range(1, 3)] private int subdivisionLevel = 1;
     [SerializeField] private bool generateOnStart = true;
     [SerializeField] private bool showDebugGizmos = true;
@@ -38,6 +38,7 @@ public class WorldGenerator : MonoBehaviour
     [Header("Biome & Spawn Settings")]
     [SerializeField] private bool assignBiomes = true;
     [SerializeField] private bool spawnObstacles = true;
+    [SerializeField] private bool generateOutlines = true;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private int playerSpawnRoomIndex = -1;
 
@@ -58,6 +59,7 @@ public class WorldGenerator : MonoBehaviour
     private List<GameObject> _spawnedRooms = new List<GameObject>();
     private List<RoomData> _roomDataList = new List<RoomData>();
     private BiomeGenerator _biomeGenerator;
+    private RoomOutlineRenderer _outlineRenderer;
     private Mesh _worldMesh;
     private MeshFilter _meshFilter;
     private MeshRenderer _meshRenderer;
@@ -132,6 +134,12 @@ public class WorldGenerator : MonoBehaviour
 
         // Step 8: Spawn player at random hexagon
         SpawnPlayer();
+
+        // Step 9: Generate room outlines
+        if (generateOutlines)
+        {
+            GenerateRoomOutlines();
+        }
 
         Debug.Log($"[WorldGenerator] Generated: {vertexCount} vertices, {pentagonCount} VIP rooms, {hexagonCount} combat rooms, {_triangles.Count} triangular faces");
     }
@@ -420,6 +428,27 @@ public class WorldGenerator : MonoBehaviour
     {
         if (roomIndex < 0 || roomIndex >= _roomDataList.Count) return null;
         return _roomDataList[roomIndex];
+    }
+
+    /// <summary>
+    /// Generates glowing outline renderers for each room.
+    /// </summary>
+    private void GenerateRoomOutlines()
+    {
+        _outlineRenderer = GetComponent<RoomOutlineRenderer>();
+        if (_outlineRenderer == null)
+        {
+            _outlineRenderer = gameObject.AddComponent<RoomOutlineRenderer>();
+        }
+
+        _outlineRenderer.GenerateOutlines(
+            _roomCenters,
+            _pentagons,
+            _hexagons,
+            _faceCenters,
+            worldRadius,
+            _roomDataList
+        );
     }
 
     private void OnDrawGizmos()

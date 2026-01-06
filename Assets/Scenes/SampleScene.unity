@@ -165,6 +165,7 @@ MonoBehaviour:
   pentRoomPrefab: {fileID: 0}
   assignBiomes: 1
   spawnObstacles: 1
+  generateOutlines: 1
   playerTransform: {fileID: 0}
   playerSpawnRoomIndex: -1
   vertexCount: 642
