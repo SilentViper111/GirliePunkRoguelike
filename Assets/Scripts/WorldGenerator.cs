@@ -305,8 +305,11 @@ public class WorldGenerator : MonoBehaviour
     public Vector3 GetRoomCenter(int roomIndex)
     {
         if (_roomCenters == null || roomIndex < 0 || roomIndex >= _roomCenters.Count)
-            return Vector3.zero;
-        return _roomCenters[roomIndex];
+            return Vector3.up * worldRadius; // Default to top of sphere
+        
+        // Ensure position is on sphere surface at correct radius
+        Vector3 center = _roomCenters[roomIndex];
+        return center.normalized * worldRadius;
     }
 
     /// <summary>
@@ -417,11 +420,25 @@ public class WorldGenerator : MonoBehaviour
         Vector3 spawnPos = GetRoomCenter(playerSpawnRoomIndex);
         Vector3 spawnNormal = spawnPos.normalized;
         
-        // Offset slightly above surface
-        playerTransform.position = spawnPos + spawnNormal * 2f;
-        playerTransform.rotation = Quaternion.LookRotation(Vector3.forward, spawnNormal);
+        // Offset above surface (player should stand ON the sphere)
+        float spawnHeight = 5f; // Higher offset to ensure not inside mesh
+        Vector3 finalPos = spawnPos + spawnNormal * spawnHeight;
         
-        Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}");
+        playerTransform.position = finalPos;
+        playerTransform.rotation = Quaternion.LookRotation(
+            Vector3.ProjectOnPlane(Vector3.forward, spawnNormal).normalized, 
+            spawnNormal
+        );
+        
+        // Reset any velocity if rigidbody exists
+        Rigidbody rb = playerTransform.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        
+        Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}, pos: {finalPos}, radius: {spawnPos.magnitude}");
     }
 
     /// <summary>
