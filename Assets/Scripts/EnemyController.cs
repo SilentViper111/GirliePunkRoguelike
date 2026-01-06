@@ -2,29 +2,38 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Basic enemy AI that patrols within its assigned room.
-/// Uses simple wander behavior on the sphere surface.
+/// Enemy AI controller with wander/chase/attack behavior on spherical world.
+/// Implements IDamageable for unified damage system.
 /// 
 /// Reference: KB Section V, Implementation Plan Phase 4
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IDamageable
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private float wanderRadius = 10f;
     [SerializeField] private float waypointReachDistance = 2f;
+    [SerializeField] private float chaseRange = 30f;
+    [SerializeField] private float attackRange = 5f;
 
     [Header("Combat")]
-    [SerializeField] private float health = 50f;
+    [SerializeField] private float maxHealth = 50f;
+    [SerializeField] private float currentHealth = 50f;
     [SerializeField] private float damage = 10f;
     [SerializeField] private float attackCooldown = 1f;
+    [SerializeField] private int scoreValue = 100;
 
     [Header("State")]
     [SerializeField] private EnemyState currentState = EnemyState.Wandering;
 
     public enum EnemyState { Idle, Wandering, Chasing, Attacking, Dead }
+
+    // IDamageable implementation
+    public bool IsAlive => currentHealth > 0;
+    public float CurrentHealth => currentHealth;
+    public float MaxHealth => maxHealth;
 
     // Internal
     private Rigidbody _rb;
@@ -32,6 +41,8 @@ public class EnemyController : MonoBehaviour
     private Vector3 _currentUp;
     private float _lastAttackTime;
     private Transform _player;
+    private Renderer _renderer;
+    private Color _originalColor;
 
     private void Awake()
     {
@@ -40,6 +51,11 @@ public class EnemyController : MonoBehaviour
         _rb.constraints = RigidbodyConstraints.FreezeRotation;
         
         _currentUp = transform.position.normalized;
+        currentHealth = maxHealth;
+        
+        _renderer = GetComponentInChildren<Renderer>();
+        if (_renderer != null)
+            _originalColor = _renderer.material.color;
     }
 
     private void Start()
@@ -70,6 +86,9 @@ public class EnemyController : MonoBehaviour
             case EnemyState.Chasing:
                 UpdateChase();
                 break;
+            case EnemyState.Attacking:
+                UpdateAttack();
+                break;
         }
 
         UpdateRotation();
@@ -88,7 +107,11 @@ public class EnemyController : MonoBehaviour
 
         float distToPlayer = Vector3.Distance(transform.position, _player.position);
         
-        if (distToPlayer < 30f)
+        if (distToPlayer < attackRange)
+        {
+            currentState = EnemyState.Attacking;
+        }
+        else if (distToPlayer < chaseRange)
         {
             currentState = EnemyState.Chasing;
         }
@@ -125,11 +148,51 @@ public class EnemyController : MonoBehaviour
         Vector3 direction = (_player.position - transform.position).normalized;
         direction = Vector3.ProjectOnPlane(direction, _currentUp).normalized;
         
-        Vector3 targetVelocity = direction * moveSpeed * 1.5f; // Faster when chasing
+        Vector3 targetVelocity = direction * moveSpeed * 1.5f;
         Vector3 currentHorizontal = Vector3.ProjectOnPlane(_rb.linearVelocity, _currentUp);
         Vector3 vertical = Vector3.Project(_rb.linearVelocity, _currentUp);
         
         _rb.linearVelocity = Vector3.Lerp(currentHorizontal, targetVelocity, Time.fixedDeltaTime * 5f) + vertical;
+    }
+
+    private void UpdateAttack()
+    {
+        if (_player == null) return;
+        
+        // Stop moving when attacking
+        Vector3 vertical = Vector3.Project(_rb.linearVelocity, _currentUp);
+        _rb.linearVelocity = vertical;
+        
+        // Attack on cooldown
+        if (Time.time >= _lastAttackTime + attackCooldown)
+        {
+            PerformAttack();
+            _lastAttackTime = Time.time;
+        }
+    }
+
+    private void PerformAttack()
+    {
+        if (_player == null) return;
+        
+        // Check if player is still in range
+        float dist = Vector3.Distance(transform.position, _player.position);
+        if (dist > attackRange * 1.5f) return;
+        
+        // Deal damage to player
+        PlayerHealth playerHealth = _player.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(damage);
+            
+            // Play effects
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.SpawnPlayerHit(_player.position);
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayHitPlayer();
+                
+            Debug.Log($"[Enemy] Attacked player for {damage} damage!");
+        }
     }
 
     private void UpdateRotation()
@@ -140,16 +203,24 @@ public class EnemyController : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(velocity.normalized, _currentUp);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed);
         }
+        else if (_player != null && currentState == EnemyState.Attacking)
+        {
+            // Face player when attacking
+            Vector3 toPlayer = Vector3.ProjectOnPlane(_player.position - transform.position, _currentUp).normalized;
+            if (toPlayer.sqrMagnitude > 0.01f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(toPlayer, _currentUp);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed);
+            }
+        }
         else
         {
-            // Just maintain up vector
             transform.rotation = Quaternion.FromToRotation(transform.up, _currentUp) * transform.rotation;
         }
     }
 
     private void SetNewWaypoint()
     {
-        // Random direction on tangent plane
         Vector3 right = Vector3.Cross(_currentUp, Vector3.forward).normalized;
         if (right.sqrMagnitude < 0.01f)
             right = Vector3.Cross(_currentUp, Vector3.right).normalized;
@@ -162,36 +233,82 @@ public class EnemyController : MonoBehaviour
         _currentWaypoint = (transform.position + offset).normalized * transform.position.magnitude;
     }
 
-    /// <summary>
-    /// Takes damage from projectiles.
-    /// </summary>
+    public void TakeDamage(float amount, Vector3 hitPoint, Vector3 hitNormal)
+    {
+        TakeDamage(amount);
+        
+        if (VFXManager.Instance != null)
+            VFXManager.Instance.SpawnImpactSparks(hitPoint, hitNormal);
+    }
+
     public void TakeDamage(float amount)
     {
-        health -= amount;
-        Debug.Log($"[Enemy] Took {amount} damage, health: {health}");
+        if (!IsAlive) return;
         
-        if (health <= 0)
+        currentHealth -= amount;
+        
+        // Flash red
+        StartCoroutine(FlashDamage());
+        
+        // Audio
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayHitEnemy();
+        
+        Debug.Log($"[Enemy] Took {amount} damage, health: {currentHealth}/{maxHealth}");
+        
+        if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    private System.Collections.IEnumerator FlashDamage()
+    {
+        if (_renderer != null)
+        {
+            _renderer.material.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            if (_renderer != null)
+                _renderer.material.color = _originalColor;
         }
     }
 
     private void Die()
     {
         currentState = EnemyState.Dead;
-        Debug.Log("[Enemy] Died!");
         
-        // TODO: Death VFX, drop loot
+        // VFX
+        if (VFXManager.Instance != null)
+            VFXManager.Instance.SpawnEnemyDeath(transform.position);
+            
+        // Audio
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayEnemyDeath();
+            
+        // Score
+        EnemySpawner spawner = FindFirstObjectByType<EnemySpawner>();
+        if (spawner != null)
+            spawner.OnEnemyKilled(gameObject, scoreValue);
+            
+        Debug.Log($"[Enemy] Died! Worth {scoreValue} points");
+        
+        // Disable physics and destroy
+        _rb.isKinematic = true;
+        GetComponent<Collider>().enabled = false;
         Destroy(gameObject, 0.5f);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        // Contact damage to player
+        if (collision.gameObject.CompareTag("Player"))
         {
-            // Deal damage to player
-            // TODO: Implement player damage system
-            Debug.Log("[Enemy] Hit player!");
+            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null && Time.time >= _lastAttackTime + attackCooldown)
+            {
+                playerHealth.TakeDamage(damage * 0.5f); // Contact does less damage
+                _lastAttackTime = Time.time;
+            }
         }
     }
 }

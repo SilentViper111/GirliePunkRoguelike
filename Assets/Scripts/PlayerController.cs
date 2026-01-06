@@ -196,6 +196,15 @@ public class PlayerController : MonoBehaviour
         if (trashPrefab == null) return;
         
         GameObject trash = Instantiate(trashPrefab, firePoint.position, transform.rotation);
+        
+        // VFX
+        if (VFXManager.Instance != null)
+            VFXManager.Instance.SpawnMuzzleFlash(firePoint.position, transform.rotation);
+            
+        // Audio
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayShootTrash();
+            
         Debug.Log("[Player] Fired Trash");
     }
 
@@ -205,6 +214,15 @@ public class PlayerController : MonoBehaviour
 
         currentBombs--;
         GameObject bomb = Instantiate(bombPrefab, firePoint.position, transform.rotation);
+        
+        // VFX
+        if (VFXManager.Instance != null)
+            VFXManager.Instance.SpawnMuzzleFlash(firePoint.position, transform.rotation);
+            
+        // Audio
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayShootBomb();
+            
         Debug.Log($"[Player] Fired Bomb ({currentBombs}/{maxBombs} remaining)");
     }
 

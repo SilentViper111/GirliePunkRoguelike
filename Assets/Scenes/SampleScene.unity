@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e5e2cd758184c368815b0d7083c478, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldGenerator
-  worldRadius: 200
+  worldRadius: 500
   subdivisionLevel: 3
   generateOnStart: 1
   showDebugGizmos: 1
@@ -423,6 +423,59 @@ MonoBehaviour:
   positionSmoothTime: 0.15
   rotationSmoothSpeed: 10
   fieldOfView: 60
+--- !u!1 &330770615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 330770617}
+  - component: {fileID: 330770616}
+  m_Layer: 0
+  m_Name: PostProcessingVolume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &330770616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330770615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deb3224fb033a46e9b9ebd00498924c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PostProcessingController
+  bloomIntensity: 1.5
+  bloomThreshold: 0.9
+  chromaticIntensity: 0.1
+  vignetteIntensity: 0.3
+  contrast: 10
+  saturation: 20
+  enableDamageEffect: 1
+  damageChromaticPulse: 0.5
+  damageVignettePulse: 0.5
+--- !u!4 &330770617
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330770615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,6 +794,169 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &730503098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 730503105}
+  - component: {fileID: 730503104}
+  - component: {fileID: 730503103}
+  - component: {fileID: 730503102}
+  - component: {fileID: 730503101}
+  - component: {fileID: 730503100}
+  - component: {fileID: 730503099}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &730503099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1218fc562c20247228b85059cff4e9cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
+  pausePanel: {fileID: 0}
+  resumeButton: {fileID: 0}
+  restartButton: {fileID: 0}
+  quitButton: {fileID: 0}
+  masterVolumeSlider: {fileID: 0}
+  musicVolumeSlider: {fileID: 0}
+  sfxVolumeSlider: {fileID: 0}
+--- !u!114 &730503100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee5a56726b8ac4f1396edde47ed272fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  enemyPrefabs: []
+  timeBetweenWaves: 30
+  timeBetweenSpawns: 2
+  baseEnemiesPerWave: 5
+  enemiesPerWaveIncrease: 2
+  maxEnemiesAlive: 30
+  minDistanceFromPlayer: 50
+  maxDistanceFromPlayer: 150
+  currentWave: 0
+  enemiesAlive: 0
+  enemiesRemainingInWave: 0
+--- !u!114 &730503101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a8945163c34e4edc8a1617b13ce667c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupSpawner
+  healthPickupPrefab: {fileID: 0}
+  bombPickupPrefab: {fileID: 0}
+  speedPickupPrefab: {fileID: 0}
+  damagePickupPrefab: {fileID: 0}
+  spawnChanceOnKill: 0.15
+  healthSpawnWeight: 0.4
+  bombSpawnWeight: 0.3
+  powerupSpawnWeight: 0.3
+  spawnHeightOffset: 2
+--- !u!114 &730503102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3d4883cb115949438c387174cffeac7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFXManager
+  muzzleFlashPrefab: {fileID: 0}
+  impactSparksPrefab: {fileID: 0}
+  enemyDeathPrefab: {fileID: 0}
+  playerHitPrefab: {fileID: 0}
+  bombExplosionPrefab: {fileID: 0}
+  effectLifetime: 2
+--- !u!114 &730503103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ab18b4db3bf04cab9757878e877e1c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  masterVolume: 1
+  musicVolume: 0.5
+  sfxVolume: 0.8
+  shootTrash: {fileID: 0}
+  shootBomb: {fileID: 0}
+  hitEnemy: {fileID: 0}
+  hitPlayer: {fileID: 0}
+  enemyDeath: {fileID: 0}
+  playerDeath: {fileID: 0}
+  bombPickup: {fileID: 0}
+  healthPickup: {fileID: 0}
+  uiClick: {fileID: 0}
+  backgroundMusic: {fileID: 0}
+--- !u!114 &730503104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf7b05aa22364318bffac1f7b3511b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  currentState: 1
+  playerHealth: {fileID: 0}
+  gameUI: {fileID: 0}
+  enemySpawner: {fileID: 0}
+  worldGenerator: {fileID: 0}
+  wavesToWin: 10
+--- !u!4 &730503105
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730503098}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &771149081 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
@@ -769,6 +985,33 @@ MonoBehaviour:
   maxBombs: 3
   currentBombs: 3
   playerCamera: {fileID: 0}
+--- !u!114 &771149088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771149081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cef5ecef9c89e4e249d39ae9d756cef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+  currentHealth: 100
+  invincibilityDuration: 1
+  flashDuration: 0.1
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  playerRenderer: {fileID: 0}
+  OnHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,6 +1311,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 771149082}
+    - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 771149088}
   m_SourcePrefab: {fileID: 100100000, guid: 582c4769af6d04e45972766b5e558185, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -1079,3 +1325,5 @@ SceneRoots:
   - {fileID: 1237520251}
   - {fileID: 303540799}
   - {fileID: 5495979521354822234}
+  - {fileID: 730503105}
+  - {fileID: 330770617}

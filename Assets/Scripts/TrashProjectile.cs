@@ -2,6 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Trash projectile - rapid fire, low damage, no retrieval.
+/// Now with proper damage dealing to IDamageable targets.
 /// 
 /// Reference: KB Section III - Trash vs Bomb differentiation
 /// </summary>
@@ -11,12 +12,12 @@ public class TrashProjectile : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float launchSpeed = 25f;
-    [SerializeField] private float damage = 5f;
+    [SerializeField] private float damage = 10f;
     [SerializeField] private float lifetime = 3f;
-    [SerializeField] private LayerMask enemyLayer;
 
     [Header("Visual")]
     [SerializeField] private TrailRenderer trailRenderer;
+    [SerializeField] private Color trailColor = Color.magenta;
 
     private Rigidbody _rb;
     private float _spawnTime;
@@ -27,7 +28,16 @@ public class TrashProjectile : MonoBehaviour
         _rb.useGravity = false;
 
         // Set to Projectile_Trash layer
-        gameObject.layer = LayerMask.NameToLayer("Projectile_Trash");
+        int layer = LayerMask.NameToLayer("Projectile_Trash");
+        if (layer >= 0)
+            gameObject.layer = layer;
+            
+        // Setup trail if exists
+        if (trailRenderer != null)
+        {
+            trailRenderer.startColor = trailColor;
+            trailRenderer.endColor = Color.clear;
+        }
     }
 
     private void Start()
@@ -51,11 +61,22 @@ public class TrashProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Check for enemy hit
-        if (((1 << collision.gameObject.layer) & enemyLayer) != 0)
+        // Get contact info for VFX
+        Vector3 hitPoint = collision.GetContact(0).point;
+        Vector3 hitNormal = collision.GetContact(0).normal;
+        
+        // Try to damage target
+        IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
+        if (damageable != null)
         {
-            // TODO: Apply damage
-            Debug.Log($"[Trash] Hit enemy: {collision.gameObject.name}");
+            damageable.TakeDamage(damage, hitPoint, hitNormal);
+            Debug.Log($"[Trash] Hit {collision.gameObject.name} for {damage} damage!");
+        }
+        else
+        {
+            // Hit environment - spawn sparks
+            if (VFXManager.Instance != null)
+                VFXManager.Instance.SpawnImpactSparks(hitPoint, hitNormal);
         }
 
         // Destroy on any collision
