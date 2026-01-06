@@ -65,15 +65,8 @@ public class WorldGenerator : MonoBehaviour
     private MeshRenderer _meshRenderer;
     private MeshCollider _meshCollider;
 
-    private void Awake()
-    {
-        if (playerTransform == null)
-        {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-                playerTransform = player.transform;
-        }
-    }
+    // Public accessor for world radius
+    public float WorldRadius => worldRadius;
 
     private void Start()
     {
@@ -421,21 +414,14 @@ public class WorldGenerator : MonoBehaviour
         }
 
         // Position player
-        if (playerTransform != null)
-        {
-            Vector3 spawnPos = GetRoomCenter(playerSpawnRoomIndex);
-            Vector3 spawnNormal = spawnPos.normalized;
-            
-            // Offset slightly above surface
-            playerTransform.position = spawnPos + spawnNormal * 2f;
-            playerTransform.rotation = Quaternion.LookRotation(Vector3.forward, spawnNormal);
-            
-            Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}");
-        }
-        else
-        {
-            Debug.LogError("[WorldGenerator] Player transform not assigned! Cannot spawn player.");
-        }
+        Vector3 spawnPos = GetRoomCenter(playerSpawnRoomIndex);
+        Vector3 spawnNormal = spawnPos.normalized;
+        
+        // Offset slightly above surface
+        playerTransform.position = spawnPos + spawnNormal * 2f;
+        playerTransform.rotation = Quaternion.LookRotation(Vector3.forward, spawnNormal);
+        
+        Debug.Log($"[WorldGenerator] Spawned player at room {playerSpawnRoomIndex}");
     }
 
     /// <summary>

@@ -110,30 +110,60 @@ public class EnemySpawner : MonoBehaviour
 
     private Vector3 GetSpawnPosition()
     {
+        // Get world radius from generator
+        float worldRadius = 500f;
+        if (_worldGenerator != null)
+        {
+            // Use reflection or a public getter if available
+            worldRadius = GetWorldRadius();
+        }
+        
         // Try to find valid spawn position
         for (int attempts = 0; attempts < 10; attempts++)
         {
-            // Random direction from player
-            Vector3 playerUp = _player.position.normalized;
+            // Player's position on sphere
+            Vector3 playerPos = _player.position;
+            Vector3 playerDir = playerPos.normalized;
+            
+            // Random point on the sphere surface
             Vector3 randomDir = Random.onUnitSphere;
-            randomDir = Vector3.ProjectOnPlane(randomDir, playerUp).normalized;
             
-            float distance = Random.Range(minDistanceFromPlayer, maxDistanceFromPlayer);
-            Vector3 spawnPos = _player.position + randomDir * distance;
+            // Calculate arc distance and ensure minimum distance
+            float angle = Random.Range(minDistanceFromPlayer / worldRadius, maxDistanceFromPlayer / worldRadius);
+            angle = Mathf.Clamp(angle, 0.1f, Mathf.PI * 0.5f); // Max 90 degrees around sphere
             
-            // Project onto sphere surface
-            float worldRadius = _worldGenerator != null ? 500f : 500f;
-            spawnPos = spawnPos.normalized * worldRadius;
+            // Rotate player direction by random angle
+            Vector3 perpendicular = Vector3.Cross(playerDir, Random.onUnitSphere).normalized;
+            if (perpendicular.sqrMagnitude < 0.01f)
+                perpendicular = Vector3.Cross(playerDir, Vector3.right).normalized;
+                
+            Vector3 spawnDir = Quaternion.AngleAxis(angle * Mathf.Rad2Deg, perpendicular) * playerDir;
+            Vector3 spawnPos = spawnDir.normalized * worldRadius;
+            
+            // Add small offset above surface so enemy doesn't spawn inside
+            spawnPos += spawnDir.normalized * 2f;
             
             // Check distance is valid
             float actualDist = Vector3.Distance(_player.position, spawnPos);
-            if (actualDist >= minDistanceFromPlayer)
+            if (actualDist >= minDistanceFromPlayer * 0.5f)
             {
                 return spawnPos;
             }
         }
         
-        return Vector3.zero;
+        // Fallback: spawn directly opposite player
+        Vector3 opposite = -_player.position.normalized * worldRadius;
+        return opposite + opposite.normalized * 2f;
+    }
+    
+    private float GetWorldRadius()
+    {
+        // Use public WorldRadius property from WorldGenerator
+        if (_worldGenerator != null)
+        {
+            return _worldGenerator.WorldRadius;
+        }
+        return 500f; // Default fallback
     }
 
     /// <summary>
