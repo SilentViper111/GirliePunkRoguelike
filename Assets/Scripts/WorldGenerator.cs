@@ -21,6 +21,11 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private bool generateOnStart = true;
     [SerializeField] private bool showDebugGizmos = true;
 
+    [Header("Mesh Settings")]
+    [SerializeField] private bool generateMesh = true;
+    [SerializeField] [Range(0f, 1f)] private float flattenAmount = 0.7f;
+    [SerializeField] private bool addMeshCollider = true;
+
     [Header("Room Sizing")]
     [SerializeField] private float hexRoomScale = 0.8f;
     [SerializeField] private float pentRoomScale = 1.0f;
@@ -42,8 +47,13 @@ public class WorldGenerator : MonoBehaviour
     private List<int[]> _pentagons;
     private List<int[]> _hexagons;
     private List<Vector3> _roomCenters;
+    private List<Vector3> _faceCenters;
     private List<int>[] _roomAdjacency;
     private List<GameObject> _spawnedRooms = new List<GameObject>();
+    private Mesh _worldMesh;
+    private MeshFilter _meshFilter;
+    private MeshRenderer _meshRenderer;
+    private MeshCollider _meshCollider;
 
     private void Start()
     {
@@ -85,7 +95,21 @@ public class WorldGenerator : MonoBehaviour
             AddRoomAdjacency(tri[2], tri[0]);
         }
 
-        // Step 4: Spawn room prefabs (if assigned)
+        // Step 4: Calculate face centers for mesh generation
+        _faceCenters = new List<Vector3>();
+        foreach (var tri in _triangles)
+        {
+            Vector3 center = (_vertices[tri[0]] + _vertices[tri[1]] + _vertices[tri[2]]) / 3f;
+            _faceCenters.Add(center.normalized * worldRadius);
+        }
+
+        // Step 5: Generate the smooth mesh
+        if (generateMesh)
+        {
+            GenerateMesh();
+        }
+
+        // Step 6: Spawn room prefabs (if assigned)
         SpawnRooms();
 
         Debug.Log($"[WorldGenerator] Generated: {vertexCount} vertices, {pentagonCount} VIP rooms, {hexagonCount} combat rooms, {_triangles.Count} triangular faces");
@@ -95,6 +119,55 @@ public class WorldGenerator : MonoBehaviour
     {
         if (!_roomAdjacency[a].Contains(b)) _roomAdjacency[a].Add(b);
         if (!_roomAdjacency[b].Contains(a)) _roomAdjacency[b].Add(a);
+    }
+
+    /// <summary>
+    /// Generates the smooth geodesic mesh with MeshFilter, MeshRenderer, and MeshCollider.
+    /// </summary>
+    private void GenerateMesh()
+    {
+        // Build the mesh using GeodesicMeshBuilder
+        _worldMesh = GeodesicMeshBuilder.BuildMesh(
+            _roomCenters,
+            _pentagons,
+            _hexagons,
+            _faceCenters,
+            flattenAmount
+        );
+
+        // Get or add MeshFilter
+        _meshFilter = GetComponent<MeshFilter>();
+        if (_meshFilter == null)
+        {
+            _meshFilter = gameObject.AddComponent<MeshFilter>();
+        }
+        _meshFilter.sharedMesh = _worldMesh;
+
+        // Get or add MeshRenderer
+        _meshRenderer = GetComponent<MeshRenderer>();
+        if (_meshRenderer == null)
+        {
+            _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+        }
+
+        // Apply neon floor material
+        if (_meshRenderer.sharedMaterial == null)
+        {
+            _meshRenderer.sharedMaterial = GeodesicMeshBuilder.CreateNeonFloorMaterial();
+        }
+
+        // Get or add MeshCollider if enabled
+        if (addMeshCollider)
+        {
+            _meshCollider = GetComponent<MeshCollider>();
+            if (_meshCollider == null)
+            {
+                _meshCollider = gameObject.AddComponent<MeshCollider>();
+            }
+            _meshCollider.sharedMesh = _worldMesh;
+        }
+
+        Debug.Log($"[WorldGenerator] Mesh generated and applied with {(addMeshCollider ? "collider" : "no collider")}");
     }
 
     /// <summary>
@@ -135,11 +208,12 @@ public class WorldGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Clears all spawned rooms.
+    /// Clears all spawned rooms and mesh resources.
     /// </summary>
     [ContextMenu("Clear World")]
     public void ClearWorld()
     {
+        // Clear spawned room prefabs
         foreach (var room in _spawnedRooms)
         {
             if (room != null)
@@ -151,6 +225,22 @@ public class WorldGenerator : MonoBehaviour
             }
         }
         _spawnedRooms.Clear();
+
+        // Clear mesh
+        if (_worldMesh != null)
+        {
+            if (Application.isPlaying)
+                Destroy(_worldMesh);
+            else
+                DestroyImmediate(_worldMesh);
+            _worldMesh = null;
+        }
+
+        // Reset mesh filter
+        if (_meshFilter != null)
+        {
+            _meshFilter.sharedMesh = null;
+        }
     }
 
     /// <summary>
