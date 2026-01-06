@@ -43,7 +43,7 @@ public class BombshellController : MonoBehaviour
     private Rigidbody _rb;
     private SphereCollider _collider;
     private float _spawnTime;
-    private PlayerController _player;
+    private GirliePlayerController _player;
     private bool _hasExploded;
     private HashSet<Collider> _hitEnemies = new HashSet<Collider>();
 
@@ -51,7 +51,7 @@ public class BombshellController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _collider = GetComponent<SphereCollider>();
-        _player = FindFirstObjectByType<PlayerController>();
+        _player = FindFirstObjectByType<GirliePlayerController>();
 
         // Configure physics material for bouncing
         PhysicsMaterial bounceMat = new PhysicsMaterial("BombBounce");
@@ -182,11 +182,11 @@ public class BombshellController : MonoBehaviour
         int playerLayer = LayerMask.NameToLayer("Player");
         if (other.gameObject.layer == playerLayer || other.CompareTag("Player"))
         {
-            RetrieveBomb(other.GetComponent<PlayerController>());
+            RetrieveBomb(other.GetComponent<GirliePlayerController>());
         }
     }
 
-    private void RetrieveBomb(PlayerController player)
+    private void RetrieveBomb(GirliePlayerController player)
     {
         currentState = BombState.Retrieved;
         

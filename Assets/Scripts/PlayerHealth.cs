@@ -124,7 +124,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         
         // TODO: Death animation, game over screen
         // For now, just disable movement
-        var controller = GetComponent<PlayerController>();
+        var controller = GetComponent<GirliePlayerController>();
         if (controller != null)
             controller.enabled = false;
     }

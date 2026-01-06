@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Interface for any object that can receive damage.
-/// Implemented by PlayerController, EnemyController, and destructible objects.
+/// Implemented by GirliePlayerController, EnemyController, and destructible objects.
 /// 
 /// Reference: KB Section V.A - Combat System
 /// </summary>

@@ -128,7 +128,7 @@ public class AutoSetup : EditorWindow
         
         if (player != null)
         {
-            EnsureComponent<PlayerController>(player);
+            EnsureComponent<GirliePlayerController>(player);
             EnsureComponent<PlayerHealth>(player);
             EnsureComponent<PlayerDash>(player);
             EnsureComponent<ScreenShake>(player); // Attaching logic to player or camera? ScreenShake is usually on Camera or Global.

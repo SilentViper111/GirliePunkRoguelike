@@ -29,13 +29,13 @@ public class PlayerDash : MonoBehaviour
     private Vector3 _dashDirection;
     private Rigidbody _rb;
     private PlayerHealth _health;
-    private PlayerController _controller;
+    private GirliePlayerController _controller;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _health = GetComponent<PlayerHealth>();
-        _controller = GetComponent<PlayerController>();
+        _controller = GetComponent<GirliePlayerController>();
     }
 
     private void Update()

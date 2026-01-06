@@ -95,7 +95,7 @@ public class PrefabAssigner : EditorWindow
 
     private static void AssignPlayerRefs()
     {
-        PlayerController player = FindFirstObjectByType<PlayerController>();
+        GirliePlayerController player = FindFirstObjectByType<GirliePlayerController>();
         if (player == null) return;
 
         SerializedObject so = new SerializedObject(player);
@@ -122,8 +122,8 @@ public class PrefabAssigner : EditorWindow
             {
                  // Try finding GameObject field?
                  // Some scripts might expect GameObject, others Rigidbody/Projectile.
-                 // Assuming checking specific type is hard generically, but PlayerController expects Rigidbody for trash/bomb usually?
-                 // Let's check PlayerController script... 
+                 // Assuming checking specific type is hard generically, but GirliePlayerController expects Rigidbody for trash/bomb usually?
+                 // Let's check GirliePlayerController script... 
                  // public Rigidbody trashPrefab; public Rigidbody bombPrefab; 
                  // YES.
             }

@@ -78,7 +78,7 @@ public class Pickup : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
         
-        PlayerController player = other.GetComponent<PlayerController>();
+        GirliePlayerController player = other.GetComponent<GirliePlayerController>();
         PlayerHealth health = other.GetComponent<PlayerHealth>();
         
         bool collected = false;

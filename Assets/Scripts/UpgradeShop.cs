@@ -40,7 +40,7 @@ public class UpgradeShop : MonoBehaviour
     [SerializeField] private List<Upgrade> upgrades = new List<Upgrade>();
 
     [Header("References")]
-    [SerializeField] private PlayerController player;
+    [SerializeField] private GirliePlayerController player;
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private PlayerDash playerDash;
     [SerializeField] private GameUI gameUI;
@@ -63,7 +63,7 @@ public class UpgradeShop : MonoBehaviour
     private void Start()
     {
         // Find references
-        if (player == null) player = FindFirstObjectByType<PlayerController>();
+        if (player == null) player = FindFirstObjectByType<GirliePlayerController>();
         if (playerHealth == null) playerHealth = FindFirstObjectByType<PlayerHealth>();
         if (playerDash == null) playerDash = FindFirstObjectByType<PlayerDash>();
         if (gameUI == null) gameUI = FindFirstObjectByType<GameUI>();
@@ -221,7 +221,7 @@ public class UpgradeShop : MonoBehaviour
                     playerHealth.SetMaxHealth(100 + totalValue, true);
                 break;
 
-            // Other upgrades require modifying PlayerController fields
+            // Other upgrades require modifying GirliePlayerController fields
             // For now, store the values and let scripts query them
         }
     }

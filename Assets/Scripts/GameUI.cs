@@ -34,7 +34,7 @@ public class GameUI : MonoBehaviour
     
     [Header("References")]
     [SerializeField] private PlayerHealth playerHealth;
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private GirliePlayerController playerController;
     
     // Score tracking
     private int _currentScore;
@@ -46,7 +46,7 @@ public class GameUI : MonoBehaviour
         if (playerHealth == null)
             playerHealth = FindFirstObjectByType<PlayerHealth>();
         if (playerController == null)
-            playerController = FindFirstObjectByType<PlayerController>();
+            playerController = FindFirstObjectByType<GirliePlayerController>();
             
         // Load high score
         _highScore = PlayerPrefs.GetInt("HighScore", 0);

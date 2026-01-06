@@ -1444,7 +1444,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee5a56726b8ac4f1396edde47ed272fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemyPrefabs: []
+  enemyPrefabs:
+  - {fileID: 8585829004763519686, guid: 2e28a931b57db4454a175f1231737e94, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   timeBetweenWaves: 30
   timeBetweenSpawns: 2
   baseEnemiesPerWave: 5
@@ -1574,14 +1581,22 @@ MonoBehaviour:
   moveSpeed: 10
   rotationSpeed: 15
   gravityStrength: 20
-  trashPrefab: {fileID: 0}
-  bombPrefab: {fileID: 0}
+  trashPrefab: {fileID: 5580762647628404937, guid: a5ca4b2f93aa94a9694f2e905dca3efc, type: 3}
+  bombPrefab: {fileID: 2007207478356871362, guid: f718831933a724ffe8c4aedad34780d2, type: 3}
   firePoint: {fileID: 0}
   trashFireRate: 0.15
   bombCooldown: 0.5
   maxBombs: 3
   currentBombs: 3
   playerCamera: {fileID: 0}
+  _rb: {fileID: 0}
+  _moveInput: {x: 0, y: 0}
+  _aimInput: {x: 0, y: 0}
+  _currentUp: {x: 0, y: 0, z: 0}
+  _lastTrashTime: 0
+  _lastBombTime: 0
+  _wantsToFireTrash: 0
+  _wantsToFireBomb: 0
 --- !u!114 &771149088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1663,6 +1678,29 @@ MonoBehaviour:
   regenEnabled: 1
   lastDamageTime: 0
   isRegenerating: 0
+--- !u!114 &771149092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771149081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b653834d0714c1da24d888abe4ba21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GirliePlayerController
+  moveSpeed: 10
+  rotationSpeed: 15
+  gravityStrength: 20
+  trashPrefab: {fileID: 0}
+  bombPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  trashFireRate: 0.15
+  bombCooldown: 0.5
+  maxBombs: 3
+  currentBombs: 3
+  playerCamera: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2192,7 +2230,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefabs:
-  - {fileID: 0}
+  - {fileID: 8585829004763519686, guid: 2e28a931b57db4454a175f1231737e94, type: 3}
+  - {fileID: 5219795661359659389, guid: 3ebf8c014f91b4136a636c388faaf4be, type: 3}
+  - {fileID: 6934368374616345957, guid: c3ca819c4992d448986caf8c24acf204, type: 3}
+  - {fileID: 8371793401950476285, guid: 57bb4d2513b7849b3bcce40ea9ab72e2, type: 3}
+  - {fileID: 7532013361338732842, guid: 50d3bb579c4714701ab26b9a1f0edd4b, type: 3}
+  - {fileID: 3323407155984500587, guid: be56b34c9d68245c3a3f429f3a7aea23, type: 3}
+  - {fileID: 8421390926334946320, guid: 9a710675daaf2429ca9a2e074c0c2943, type: 3}
   timeBetweenWaves: 30
   timeBetweenSpawns: 2
   baseEnemiesPerWave: 5
@@ -2826,6 +2870,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
       insertIndex: -1
       addedObject: {fileID: 771149091}
+    - targetCorrespondingSourceObject: {fileID: 6221470015316901794, guid: 582c4769af6d04e45972766b5e558185, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 771149092}
   m_SourcePrefab: {fileID: 100100000, guid: 582c4769af6d04e45972766b5e558185, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
