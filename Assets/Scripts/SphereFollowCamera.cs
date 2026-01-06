@@ -51,24 +51,38 @@ public class SphereFollowCamera : MonoBehaviour
             if (player != null)
             {
                 target = player.transform;
-                Debug.Log($"[SphereFollowCamera] Found target: {target.name}");
+                Debug.Log($"[SphereFollowCamera] Found target: {target.name} at position {target.position}");
+                
+                // IMMEDIATELY snap to correct position
+                SnapToTarget();
+                Debug.Log($"[SphereFollowCamera] Snapped camera to {transform.position}");
             }
             else
             {
                 Debug.LogWarning("[SphereFollowCamera] No player found! Assign target manually.");
             }
         }
-
-        // Initial position
-        if (target != null)
+        else if (target != null)
         {
+            // Already have target, snap to it
             SnapToTarget();
         }
     }
 
     private void LateUpdate()
     {
-        if (target == null) return;
+        // Keep trying to find target if we don't have one
+        if (target == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                target = player.transform;
+                SnapToTarget();
+                Debug.Log($"[SphereFollowCamera] LateUpdate found target at {target.position}, camera at {transform.position}");
+            }
+            return;
+        }
 
         UpdateCameraPosition();
         UpdateCameraRotation();
